@@ -436,7 +436,7 @@ $(EE_ASM_DIR)hdd_hdpro_cdvdman.c: modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx 
 	$(BIN2C) $< $@ $(*F)_irx
 
 modules/iopcore/cdvdfsv/cdvdfsv.irx: modules/iopcore/cdvdfsv
-	$(MAKE) -C $<
+	$(MAKE) $(CDVDMAN_DEBUG_FLAGS) -C $<
 
 $(EE_ASM_DIR)cdvdfsv.c: modules/iopcore/cdvdfsv/cdvdfsv.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx

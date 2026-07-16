@@ -13,6 +13,7 @@ static void StStartFillStreamBuffer(void);
 
 static unsigned int StmScheduleCb(void *arg)
 {
+    iDPRINTF("StmScheduleCb: alarm fired, retrying stream fill\n");
     return ((StFillStreamBuffer() >= 0) ? 0 : 0x00704000);
 }
 

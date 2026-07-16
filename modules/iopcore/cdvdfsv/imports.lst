@@ -77,3 +77,13 @@ thevent_IMPORTS_start
 I_ClearEventFlag
 I_WaitEventFlag
 thevent_IMPORTS_end
+
+#ifdef __IOPCORE_DEBUG
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end
+
+sysmem_IMPORTS_start
+I_Kprintf
+sysmem_IMPORTS_end
+#endif

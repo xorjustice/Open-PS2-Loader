@@ -127,7 +127,10 @@ static inline void cdvd_readee(void *buf)
     r->eeaddr2 = (void *)((u32)r->eeaddr2 & 0x1fffffff);
     r->buf = (void *)((u32)r->buf & 0x1fffffff);
 
+    DPRINTF("cdvd_readee: lsn=%u sectors=%u secsize=%u buf=%p\n", (unsigned int)r->lsn, (unsigned int)r->sectors, (unsigned int)sector_size, r->buf);
+
     sceCdDiskReady(0);
+    DPRINTF("cdvd_readee: drive ready\n");
 
     sectors_to_read = r->sectors;
     bytesent = 0;
@@ -188,6 +191,7 @@ static inline void cdvd_readee(void *buf)
             }
 
             if (sceCdRead(r->lsn, temp, (void *)fsvRbuf, NULL) == 0) {
+                DPRINTF("cdvd_readee: !!ABORT at lsn=%u: sent %u of %u bytes (sceCdRead busy, err=%d)\n", (unsigned int)r->lsn, (unsigned int)bytesent, (unsigned int)nbytes, sceCdGetError());
                 if (sceCdGetError() == SCECdErNO) {
                     fsverror = SCECdErREADCF;
                     sceCdSC(CDSC_SET_ERROR, &fsverror);
@@ -234,7 +238,7 @@ static inline void cdvd_readee(void *buf)
 static inline void cdvdSt_read(void *buf)
 {
     RpcCdvdStream_t *St = (RpcCdvdStream_t *)buf;
-    u32 err;
+    u32 err = 0;
     int r, rpos, remaining;
     void *ee_addr;
 
@@ -242,6 +246,9 @@ static inline void cdvdSt_read(void *buf)
         if ((r = sceCdStRead(remaining, (void *)((u32)ee_addr | 0x80000000), 0, &err)) < 1)
             break;
     }
+
+    if (remaining > 0)
+        DPRINTF("cdvdSt_read: UNDERRUN, got %u of %u sectors, err=%u\n", (unsigned int)rpos, (unsigned int)St->sectors, (unsigned int)err);
 
     *(int *)buf = (rpos & 0xFFFF) | (err << 16);
 }

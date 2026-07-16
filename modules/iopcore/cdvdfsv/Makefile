@@ -7,6 +7,10 @@ ifeq ($(DEBUG),1)
 IOP_CFLAGS += -DDEBUG
 endif
 
+ifeq ($(IOPCORE_DEBUG),1)
+IOP_CFLAGS += -D__IOPCORE_DEBUG
+endif
+
 include $(PS2SDK)/Defs.make
 include ../../Rules.bin.make
 include $(PS2SDK)/samples/Makefile.iopglobal
