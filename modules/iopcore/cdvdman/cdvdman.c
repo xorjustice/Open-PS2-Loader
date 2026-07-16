@@ -127,6 +127,12 @@ void cdvdman_init(void)
 #endif
 
     if (!cdvdman_cdinited) {
+/* Self-identify the build in the log, so a verbose ELF cannot be mistaken for a quiet one. */
+#ifdef __IOPCORE_DEBUG_QUIET
+        EPRINTF("cdvdman: debug build (quiet mode)\n");
+#else
+        EPRINTF("cdvdman: debug build (verbose mode)\n");
+#endif
         cdvdman_stat.err = SCECdErNO;
 
         cdvdman_fs_init();
