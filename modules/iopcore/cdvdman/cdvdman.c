@@ -266,7 +266,9 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
     void *ptr;
     int endOfMedia = 0;
 
-    DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
+    /* Kept in quiet mode: reads are ~1% of debug log volume (the status polls are the
+       expensive part), and the read pattern is what identifies stalls and retry loops. */
+    EPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
     if (mediaLsnCount) {
 
