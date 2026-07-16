@@ -457,9 +457,9 @@ int cdvdman_AsyncRead(u32 lsn, u32 sectors, u16 sector_size, void *buf)
         CpuResumeIntr(OldState);
         // printf must not be used from interrupt context (e.g. the streaming refill alarm); Kprintf is safe there.
         if (IsIntrContext) {
-            iDPRINTF("cdvdman_AsyncRead: exiting (sync_flag)...\n");
+            iEPRINTF("cdvdman_AsyncRead: CONTENTION (sync_flag) lsn=%u sectors=%u intr\n", (unsigned int)lsn, (unsigned int)sectors);
         } else {
-            DPRINTF("cdvdman_AsyncRead: exiting (sync_flag)...\n");
+            EPRINTF("cdvdman_AsyncRead: CONTENTION (sync_flag) lsn=%u sectors=%u thread\n", (unsigned int)lsn, (unsigned int)sectors);
         }
         return 0;
     }

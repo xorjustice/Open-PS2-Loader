@@ -120,7 +120,7 @@ jobs:
       matrix:
         # NOTE: branch-local trim for Phase 0 debugging iteration speed - restore full matrix before upstreaming:
         # debug: [iopcore_debug, ingame_debug, eesio_debug, iopcore_ppctty_debug, ingame_ppctty_debug, DTL_T10000=1]
-        debug: [iopcore_debug]
+        debug: [iopcore_debug, iopcore_debug_quiet]
         # container_commit: [":main", "@sha256:1f00689809455d43b520e4cd4eea00c6be56d71819ae38efc6b55b56464cbd1e"] Replace with desired docker image hash or tag
         container_commit: [":main"]
     runs-on: ubuntu-latest

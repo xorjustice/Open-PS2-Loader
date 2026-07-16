@@ -13,7 +13,7 @@ static void StStartFillStreamBuffer(void);
 
 static unsigned int StmScheduleCb(void *arg)
 {
-    iDPRINTF("StmScheduleCb: alarm fired, retrying stream fill\n");
+    iEPRINTF("StmScheduleCb: deferred fill alarm fired\n");
     return ((StFillStreamBuffer() >= 0) ? 0 : 0x00704000);
 }
 
@@ -93,7 +93,7 @@ static void StStartFillStreamBuffer(void)
     iop_sys_clock_t StmScheduleClock;
 
     if (StFillStreamBuffer() < 0) {
-        DPRINTF("StmCallback: Rescheduling read.\n");
+        EPRINTF("StStartFillStreamBuffer: fill blocked, deferring ~200ms\n");
         StmScheduleClock.lo = 0x00704000;
         StmScheduleClock.hi = 0;
         SetAlarm(&StmScheduleClock, &StmScheduleCb, &cdvdman_stat.StreamingData);
@@ -265,7 +265,7 @@ int sceCdStStart(u32 lsn, sceCdRMode *mode)
 {
     int OldState;
 
-    DPRINTF("StStart called. lsn: 0x%08lx\n", lsn);
+    EPRINTF("StStart called. lsn: 0x%08lx\n", lsn);
 
     sceCdStStop();
 
@@ -400,7 +400,7 @@ int sceCdStRead(u32 sectors, u32 *buffer, u32 mode, u32 *error)
             //		DPRINTF(", Read: %u\n", SectorsRead);
 
             if (SectorsRead == 0)
-                DPRINTF("StRead: buffer underrun. %u/%lu read.\n", result, sectors);
+                EPRINTF("StRead: BUFFER UNDERRUN. %u/%lu read, streamed=%u\n", result, sectors, cdvdman_stat.StreamingData.StStreamed);
 
             result += SectorsRead;
             // if(mode == STMNBLK) break;

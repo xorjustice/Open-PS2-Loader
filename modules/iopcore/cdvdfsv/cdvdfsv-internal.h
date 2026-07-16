@@ -23,11 +23,23 @@
 #include "smsutils.h"
 
 #ifdef __IOPCORE_DEBUG
+/* See modules/iopcore/cdvdman/internal.h for the rationale behind the quiet
+   mode and the EPRINTF/DPRINTF split. */
+#ifdef __IOPCORE_DEBUG_QUIET
+#define DPRINTF(args...)
+#define iDPRINTF(args...)
+#else
 #define DPRINTF(args...)  printf(args)
 #define iDPRINTF(args...) Kprintf(args)
+#endif
+/* Rare events only (partial transfers, underruns). */
+#define EPRINTF(args...)  printf(args)
+#define iEPRINTF(args...) Kprintf(args)
 #else
 #define DPRINTF(args...)
 #define iDPRINTF(args...)
+#define EPRINTF(args...)
+#define iEPRINTF(args...)
 #endif
 
 extern void cdvdfsv_register_scmd_rpc(SifRpcDataQueue_t *rpc_DQ);

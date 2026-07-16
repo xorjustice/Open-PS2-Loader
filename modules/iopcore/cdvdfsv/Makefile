@@ -9,6 +9,9 @@ endif
 
 ifeq ($(IOPCORE_DEBUG),1)
 IOP_CFLAGS += -D__IOPCORE_DEBUG
+ifeq ($(IOPCORE_DEBUG_QUIET),1)
+IOP_CFLAGS += -D__IOPCORE_DEBUG_QUIET
+endif
 endif
 
 include $(PS2SDK)/Defs.make

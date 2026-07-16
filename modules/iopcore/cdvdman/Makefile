@@ -55,6 +55,9 @@ IOP_INCS += -I../common
 
 ifeq ($(IOPCORE_DEBUG),1)
 IOP_CFLAGS += -D__IOPCORE_DEBUG
+ifeq ($(IOPCORE_DEBUG_QUIET),1)
+IOP_CFLAGS += -D__IOPCORE_DEBUG_QUIET
+endif
 endif
 
 ifeq ($(USE_DEV9),1)

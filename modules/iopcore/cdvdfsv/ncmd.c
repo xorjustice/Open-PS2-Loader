@@ -191,7 +191,7 @@ static inline void cdvd_readee(void *buf)
             }
 
             if (sceCdRead(r->lsn, temp, (void *)fsvRbuf, NULL) == 0) {
-                DPRINTF("cdvd_readee: !!ABORT at lsn=%u: sent %u of %u bytes (sceCdRead busy, err=%d)\n", (unsigned int)r->lsn, (unsigned int)bytesent, (unsigned int)nbytes, sceCdGetError());
+                EPRINTF("cdvd_readee: !!ABORT at lsn=%u: sent %u of %u bytes (sceCdRead busy, err=%d)\n", (unsigned int)r->lsn, (unsigned int)bytesent, (unsigned int)nbytes, sceCdGetError());
                 if (sceCdGetError() == SCECdErNO) {
                     fsverror = SCECdErREADCF;
                     sceCdSC(CDSC_SET_ERROR, &fsverror);
@@ -248,7 +248,7 @@ static inline void cdvdSt_read(void *buf)
     }
 
     if (remaining > 0)
-        DPRINTF("cdvdSt_read: UNDERRUN, got %u of %u sectors, err=%u\n", (unsigned int)rpos, (unsigned int)St->sectors, (unsigned int)err);
+        EPRINTF("cdvdSt_read: !!SHORT READ to EE, got %u of %u sectors, err=%u\n", (unsigned int)rpos, (unsigned int)St->sectors, (unsigned int)err);
 
     *(int *)buf = (rpos & 0xFFFF) | (err << 16);
 }

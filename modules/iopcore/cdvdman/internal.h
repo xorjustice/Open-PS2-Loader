@@ -32,11 +32,25 @@
 #include "smsutils.h"
 
 #ifdef __IOPCORE_DEBUG
+/* Every print costs a UDP packet, which is slow enough to change the timing of
+   the code being traced. __IOPCORE_DEBUG_QUIET compiles out the per-read traces
+   so that only the rare EPRINTF events below are emitted, keeping timing close
+   to a release build while investigating race conditions. */
+#ifdef __IOPCORE_DEBUG_QUIET
+#define DPRINTF(args...)
+#define iDPRINTF(args...)
+#else
 #define DPRINTF(args...)  printf(args)
 #define iDPRINTF(args...) Kprintf(args)
+#endif
+/* Rare events only (contention, underruns, streaming lifecycle). */
+#define EPRINTF(args...)  printf(args)
+#define iEPRINTF(args...) Kprintf(args)
 #else
 #define DPRINTF(args...)
 #define iDPRINTF(args...)
+#define EPRINTF(args...)
+#define iEPRINTF(args...)
 #endif
 
 #ifdef HDD_DRIVER

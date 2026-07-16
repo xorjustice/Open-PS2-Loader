@@ -8,6 +8,8 @@ EXTRAVERSION = Beta
 # Debug modes:
 #	debug		    	 -	UI-side debug mode (UDPTTY)
 #	iopcore_debug		 -	UI-side + iopcore debug mode (UDPTTY).
+#	iopcore_debug_quiet	 -	As iopcore_debug, but without the per-read traces, so that
+#				    logging does not perturb the timing of races being traced.
 #	ingame_debug		 -	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (UDPTTY).
 #	debug_ppctty		 -	UI-side debug mode (PowerPC UART)
 #	iopcore_ppctty_debug -	UI-side + iopcore debug mode (PowerPC UART).
@@ -180,6 +182,9 @@ ifeq ($(DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
     EECORE_EXTRA_FLAGS += LOAD_DEBUG_MODULES=1
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
+    ifeq ($(IOPCORE_QUIET),1)
+      CDVDMAN_DEBUG_FLAGS += IOPCORE_DEBUG_QUIET=1
+    endif
     MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
     SMSTCPIP_INGAME_CFLAGS =
     ifeq ($(TTY_APPROACH),UDP)
@@ -230,7 +235,7 @@ EE_LDFLAGS += -fdata-sections -ffunction-sections -Wl,--gc-sections
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug debug_ppctty iopcore_ppctty_debug ingame_ppctty_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages
+.PHONY: all release debug iopcore_debug iopcore_debug_quiet eesio_debug ingame_debug deci2_debug debug_ppctty iopcore_ppctty_debug ingame_ppctty_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages
 
 ifdef PS2SDK
 
@@ -250,6 +255,9 @@ debug:
 
 iopcore_debug:
 	$(MAKE) DEBUG=1 IOPCORE_DEBUG=1 all
+
+iopcore_debug_quiet:
+	$(MAKE) DEBUG=1 IOPCORE_DEBUG=1 IOPCORE_QUIET=1 all
 
 eesio_debug:
 	$(MAKE) DEBUG=1 EESIO_DEBUG=1 all
