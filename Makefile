@@ -184,6 +184,9 @@ ifeq ($(DEBUG),1)
     SMSTCPIP_INGAME_CFLAGS =
     ifeq ($(TTY_APPROACH),UDP)
       IOP_OBJS += udptty-ingame.o
+      EECORE_EXTRA_FLAGS += "TTY_APPROACH=$(TTY_APPROACH)"
+    else ifeq ($(TTY_APPROACH),PPC_UART)
+      EECORE_EXTRA_FLAGS += "TTY_APPROACH=$(TTY_APPROACH)"
     endif
   else ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
