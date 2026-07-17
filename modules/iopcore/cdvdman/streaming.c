@@ -6,18 +6,10 @@
 
 #include "internal.h"
 
-/* Upper bound, in 1ms polls, on how long sceCdStStart() waits for the ring buffer to fill.
-   A bank is filled in about 1ms from a HDD, but takes ~15ms with accurate reads enabled
-   (~909us/sector), so a typical 5-bank buffer needs ~75ms there. This is only a safety net
-   to bound the wait if reads fail or the buffer is unusually large; the normal exit is the
-   buffer becoming full. */
-#define ST_PRIME_MAX_POLLS 1000
-
 static int AllocBank(void **pointer);
 static int ReadSectors(int maxcount, void *buffer);
 static int StFillStreamBuffer(void);
 static void StStartFillStreamBuffer(void);
-static void StPrimeBuffer(void);
 
 static unsigned int StmScheduleCb(void *arg)
 {
@@ -106,41 +98,6 @@ static void StStartFillStreamBuffer(void)
         StmScheduleClock.hi = 0;
         SetAlarm(&StmScheduleClock, &StmScheduleCb, &cdvdman_stat.StreamingData);
     }
-}
-
-/* Wait for the stream buffer to fill before letting the caller proceed.
-
-   A real drive is already streaming into its buffer by the time sceCdStStart() returns, but
-   we only kick off the first bank read asynchronously, so a game that calls sceCdStRead()
-   immediately afterwards can find the buffer still empty. It is then handed 0 sectors with
-   no error, which libcdvd's EE-side blocking loop cannot exit -- it only breaks out when the
-   error is non-zero -- so playback stalls. Reading from a HDD normally wins that race by a
-   hair, which is why this only bites intermittently, and always when reads are slowed down.
-
-   Bounded, and skipped in an interrupt context: if reads fail or time out we simply return
-   as before, leaving the caller no worse off than it was. */
-static void StPrimeBuffer(void)
-{
-    /* Updated by StmCallback() from the reading thread, so re-read them on every poll. */
-    volatile unsigned short int *streamed = &cdvdman_stat.StreamingData.StStreamed;
-    volatile unsigned short int *stat = &cdvdman_stat.StreamingData.StStat;
-    volatile int *err = &cdvdman_stat.err;
-    int i;
-
-    if (QueryIntrContext())
-        return;
-
-    for (i = 0; i < ST_PRIME_MAX_POLLS; i++) {
-        if (*streamed >= cdvdman_stat.StreamingData.StBufmax)
-            break;
-        /* Streaming stopped, or a read failed (e.g. end of media): nothing more is coming. */
-        if (!*stat || *err != SCECdErNO)
-            break;
-
-        DelayThread(1000);
-    }
-
-    EPRINTF("StStart: primed %u/%u sectors after %dms, err=%d\n", (unsigned int)*streamed, (unsigned int)cdvdman_stat.StreamingData.StBufmax, i, *err);
 }
 
 int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr)
@@ -323,7 +280,6 @@ int sceCdStStart(u32 lsn, sceCdRMode *mode)
     cdvdman_stat.err = SCECdErNO;
     cdvdman_stat.status = SCECdStatPause;
     StStartFillStreamBuffer();
-    StPrimeBuffer();
 
     return 1;
 }
