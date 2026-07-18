@@ -46,11 +46,29 @@
 /* Rare events only (contention, underruns, streaming lifecycle). */
 #define EPRINTF(args...)  printf(args)
 #define iEPRINTF(args...) Kprintf(args)
+
+/* Zero-cost call-rate counters, dumped as one log line every 2s by an alarm in cdvdman.c.
+   printf-per-call tracing of the hot poll paths (sceCdStatus etc.) perturbs timing enough
+   to mask the bugs being investigated; an increment does not. */
+enum cdvdman_dbg_counter {
+    DBG_CNT_STATUS = 0, /* sceCdStatus */
+    DBG_CNT_SYNC,       /* sceCdSync */
+    DBG_CNT_READ,       /* sceCdRead */
+    DBG_CNT_DISKREADY,  /* sceCdDiskReady */
+    DBG_CNT_GETERROR,   /* sceCdGetError */
+    DBG_CNT_STREAD,     /* sceCdStRead */
+    DBG_CNT_STSTAT,     /* sceCdStStat */
+    DBG_CNT_READPOS,    /* sceCdGetReadPos */
+    DBG_CNT_COUNT
+};
+extern volatile unsigned int cdvdman_dbg_counters[DBG_CNT_COUNT];
+#define DBGCNT(i) (cdvdman_dbg_counters[i]++)
 #else
 #define DPRINTF(args...)
 #define iDPRINTF(args...)
 #define EPRINTF(args...)
 #define iEPRINTF(args...)
+#define DBGCNT(i)
 #endif
 
 #ifdef HDD_DRIVER

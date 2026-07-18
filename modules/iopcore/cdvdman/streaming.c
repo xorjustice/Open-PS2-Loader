@@ -286,6 +286,7 @@ int sceCdStStart(u32 lsn, sceCdRMode *mode)
 
 int sceCdStStat(void)
 {
+    DBGCNT(DBG_CNT_STSTAT);
     DPRINTF("StStat called: %u\n", cdvdman_stat.StreamingData.StStreamed);
     cdvdman_stat.err = SCECdErNO;
     return cdvdman_stat.StreamingData.StStreamed;
@@ -382,6 +383,8 @@ int sceCdStRead(u32 sectors, u32 *buffer, u32 mode, u32 *error)
 {
     int SectorsRead, SectorsToRead, result;
     void *ptr;
+
+    DBGCNT(DBG_CNT_STREAD);
 
     DPRINTF("StRead called: sectors %lu:%p, mode: %lu, stat: %u,%u\n", sectors, buffer, mode, cdvdman_stat.StreamingData.StStat, cdvdman_stat.StreamingData.StIsReading);
 

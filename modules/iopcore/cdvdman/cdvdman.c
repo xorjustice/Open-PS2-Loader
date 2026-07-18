@@ -120,6 +120,31 @@ static void cdvdman_poff_thread(void *arg)
 }
 #endif
 
+#ifdef __IOPCORE_DEBUG
+volatile unsigned int cdvdman_dbg_counters[DBG_CNT_COUNT];
+static unsigned int cdvdman_dbg_prev[DBG_CNT_COUNT];
+static iop_sys_clock_t cdvdman_dbg_clock;
+
+/* Runs in interrupt context every 2s; one Kprintf line with the per-interval call rates. */
+static unsigned int cdvdman_dbg_dump_cb(void *arg)
+{
+    unsigned int d[DBG_CNT_COUNT];
+    int i;
+
+    for (i = 0; i < DBG_CNT_COUNT; i++) {
+        d[i] = cdvdman_dbg_counters[i] - cdvdman_dbg_prev[i];
+        cdvdman_dbg_prev[i] += d[i];
+    }
+
+    iEPRINTF("CNT st=%u sy=%u rd=%u dr=%u ge=%u sr=%u ss=%u rp=%u | stat=%u strm=%u\n",
+             d[DBG_CNT_STATUS], d[DBG_CNT_SYNC], d[DBG_CNT_READ], d[DBG_CNT_DISKREADY],
+             d[DBG_CNT_GETERROR], d[DBG_CNT_STREAD], d[DBG_CNT_STSTAT], d[DBG_CNT_READPOS],
+             (unsigned int)cdvdman_stat.status, (unsigned int)cdvdman_stat.StreamingData.StStreamed);
+
+    return cdvdman_dbg_clock.lo; /* re-arm with the same period */
+}
+#endif
+
 void cdvdman_init(void)
 {
 #ifdef __USE_DEV9
@@ -132,6 +157,11 @@ void cdvdman_init(void)
         EPRINTF("cdvdman: debug build (quiet mode)\n");
 #else
         EPRINTF("cdvdman: debug build (verbose mode)\n");
+#endif
+#ifdef __IOPCORE_DEBUG
+        /* Start the 2s call-rate counter dump. */
+        USec2SysClock(2000 * 1000, &cdvdman_dbg_clock);
+        SetAlarm(&cdvdman_dbg_clock, &cdvdman_dbg_dump_cb, NULL);
 #endif
         cdvdman_stat.err = SCECdErNO;
 
@@ -432,6 +462,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, u16 sector_size, void *buf)
 //-------------------------------------------------------------------------
 u32 sceCdGetReadPos(void)
 {
+    DBGCNT(DBG_CNT_READPOS);
     DPRINTF("sceCdGetReadPos\n");
 
     return ReadPos;

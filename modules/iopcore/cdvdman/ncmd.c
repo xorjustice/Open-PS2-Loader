@@ -9,6 +9,7 @@
 //-------------------------------------------------------------------------
 int sceCdSync(int mode)
 {
+    DBGCNT(DBG_CNT_SYNC);
     DPRINTF("sceCdSync %d sync flag = %d\n", mode, sync_flag);
 
     if (!sync_flag)
@@ -29,6 +30,8 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, sceCdRMode *mode)
     int result;
 
     u16 sector_size = 2048;
+
+    DBGCNT(DBG_CNT_READ);
 
     // Is is NULL in our emulated cdvdman routines so check if valid.
     if (mode) {
@@ -281,6 +284,7 @@ int sceCdPause(void)
 //-------------------------------------------------------------------------
 int sceCdDiskReady(int mode)
 {
+    DBGCNT(DBG_CNT_DISKREADY);
     DPRINTF("sceCdDiskReady %d\n", mode);
     cdvdman_stat.err = SCECdErNO;
 
