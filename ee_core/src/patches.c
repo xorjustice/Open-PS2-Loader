@@ -86,6 +86,9 @@ static const patchlist_t patch_list[] = {
     {"SLES_528.22", ETH_MODE, {PATCH_GENERIC_SLOW_READS, 0x000c0000, 0x0060f4dc}}, // Prince of Persia: Warrior Within PAL - slow down cdvd reads
     {"SLES_528.22", HDD_MODE, {PATCH_GENERIC_SLOW_READS, 0x00040000, 0x0060f4dc}}, // Prince of Persia: Warrior Within PAL - slow down cdvd reads
     {"SLUS_214.32", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00080000, 0x002baf34}}, // NRA Gun Club NTSC U
+    {"SLUS_202.33", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00040000, 0x00106b84}}, // Mobile Suit Gundam: Zeonic Front NTSC U (#1073) - mission freeze/crawl during voiced
+    {"SLUS_202.33", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00040000, 0x00106c08}}, // call events: delay the asset loader's two sceCdRead call sites (the sound streamer's
+                                                                                   // wrapper at 0x00117370 and the movie path are deliberately left at full speed)
     {"SLUS_209.77", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Quest
     {"SLPM_656.32", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Fighter Cyber Generation: Judgment Six No Yabou
     {"SLPM_654.05", HDD_MODE, {PATCH_SDF_MACROSS, 0x00200000, 0x00249b84}},        // Super Dimensional Fortress Macross JPN
