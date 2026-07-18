@@ -77,6 +77,7 @@ extern volatile unsigned int cdvdman_dbg_counters[DBG_CNT_COUNT];
 #define iDPRINTF(args...)
 #define EPRINTF(args...)
 #define iEPRINTF(args...)
+#define RPRINTF(args...)
 #define DBGCNT(i)
 #endif
 
