@@ -47,6 +47,15 @@
 #define EPRINTF(args...)  printf(args)
 #define iEPRINTF(args...) Kprintf(args)
 
+/* Per-read traces. These fire a few times/sec, enough UDP traffic to nudge timing, so quiet
+   mode drops them and relies on the counters below for read-rate visibility. Verbose keeps
+   them for the buffer-level detail (which streams are active). */
+#ifdef __IOPCORE_DEBUG_QUIET
+#define RPRINTF(args...)
+#else
+#define RPRINTF(args...) printf(args)
+#endif
+
 /* Zero-cost call-rate counters, dumped as one log line every 2s by an alarm in cdvdman.c.
    printf-per-call tracing of the hot poll paths (sceCdStatus etc.) perturbs timing enough
    to mask the bugs being investigated; an increment does not. */

@@ -127,8 +127,8 @@ static inline void cdvd_readee(void *buf)
     r->eeaddr2 = (void *)((u32)r->eeaddr2 & 0x1fffffff);
     r->buf = (void *)((u32)r->buf & 0x1fffffff);
 
-    /* Kept in quiet mode: distinguishes EE game reads from streaming refills. */
-    EPRINTF("cdvd_readee: lsn=%u sectors=%u secsize=%u buf=%p\n", (unsigned int)r->lsn, (unsigned int)r->sectors, (unsigned int)sector_size, r->buf);
+    /* Verbose only; quiet relies on counters for read-rate visibility. */
+    RPRINTF("cdvd_readee: lsn=%u sectors=%u secsize=%u buf=%p\n", (unsigned int)r->lsn, (unsigned int)r->sectors, (unsigned int)sector_size, r->buf);
 
     sceCdDiskReady(0);
     DPRINTF("cdvd_readee: drive ready\n");

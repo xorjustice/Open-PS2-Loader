@@ -35,11 +35,18 @@
 /* Rare events only (partial transfers, underruns). */
 #define EPRINTF(args...)  printf(args)
 #define iEPRINTF(args...) Kprintf(args)
+/* Per-read trace; dropped in quiet mode (see cdvdman/internal.h). */
+#ifdef __IOPCORE_DEBUG_QUIET
+#define RPRINTF(args...)
+#else
+#define RPRINTF(args...) printf(args)
+#endif
 #else
 #define DPRINTF(args...)
 #define iDPRINTF(args...)
 #define EPRINTF(args...)
 #define iEPRINTF(args...)
+#define RPRINTF(args...)
 #endif
 
 extern void cdvdfsv_register_scmd_rpc(SifRpcDataQueue_t *rpc_DQ);
