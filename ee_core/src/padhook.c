@@ -272,35 +272,6 @@ static int IGR_Intc_Handler(int cause)
     int i;
     u8 pad_pos_state, pad_pos_frame, pad_pos_combo1, pad_pos_combo2;
 
-#ifdef __INGAME_DEBUG
-    /* Main-loop heartbeat probe (#1073 crawl investigation). libpad increments a per-read
-       frame counter in the game's pad buffer every time the game reads the pad from its main
-       loop. This handler is VBLANK-interrupt-driven, so it keeps running even when the game's
-       main loop stalls; by watching that counter we can tell, during the crawl, whether the
-       game's main loop is still advancing or has stopped. The GS background colour latches the
-       verdict (visible wherever the game isn't drawing, e.g. the 'sky only' crawl state):
-         green  = main loop advanced within the last ~0.25s (alive)
-         yellow = no advance for ~0.25-1s (slowing)
-         red    = no advance for >1s (main loop itself is stalled)
-         blue   = pad buffer not hooked yet (probe has nothing to watch) */
-    {
-        static u8 hb_prev = 0;
-        static u32 hb_idle = 0;
-        if (Pad_Data.pad_buf != NULL) {
-            u8 hb_now = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_frame];
-            if (hb_now != hb_prev) {
-                hb_prev = hb_now;
-                hb_idle = 0;
-            } else if (hb_idle < 0x7fffffff) {
-                hb_idle++;
-            }
-            GS_BGCOLOUR = (hb_idle < 15) ? 0x00FF00 : (hb_idle < 60) ? 0x00FFFF : 0x0000FF;
-        } else {
-            GS_BGCOLOUR = 0xFF0000;
-        }
-    }
-#endif
-
     if (Pad_Data.pad_buf != NULL) {
         // Copy values via the uncached segment, to bypass the cache.
         pad_pos_state = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_state];
