@@ -779,27 +779,12 @@ static void cdvdman_cdread_Thread(void *args)
        The original is run from the interrupt handler, but we want it to run
        from a threaded environment because our interrupt is emulated. */
         if (Stm0Callback != NULL) {
-            /* A read completed while streaming is active. It is either a stream-fill read
-               issued by the streaming system (StIsReading set, drives the streaming callback)
-               or one of the game's own reads. StmCallback() clears StIsReading, so latch it now. */
-            int wasStreamFill = cdvdman_stat.StreamingData.StIsReading;
-
             cdvdman_signal_read_end();
 
             /* Check that the streaming callback was not cleared, as this pointer may get changed between function calls.
                As per the original semantics, once it is cleared, then it should not be called. */
             if (Stm0Callback != NULL)
                 Stm0Callback();
-
-            /* Deliver the user callback for the game's own reads even while streaming is active.
-               c6dbe9e0 stopped calling it during streaming, which regressed callback-driven games
-               that read while a stream is running: their read-completion callback goes silent the
-               moment streaming starts and their load/state machine stalls (e.g. Zeonic Front #1073,
-               where the freeze begins exactly at the first voiced call event). Stream-fill reads
-               still drive only the streaming callback, so we do not reintroduce the spurious
-               per-fill user callbacks that c6dbe9e0 was trying to remove. */
-            if (!wasStreamFill)
-                cdvdman_cb_event(SCECdFuncRead);
         } else
             cdvdman_cb_event(SCECdFuncRead); // Only runs if streaming is not in action.
     }
